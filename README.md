@@ -21,7 +21,7 @@ Created by **[Ayoola Damisile](https://github.com/Ayoola-tech2024)**
 [![Security: AES--256--GCM](https://img.shields.io/badge/security-AES--256--GCM-success.svg)]()
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-[Quick Start](#-quick-start) • [Why EnvVault](#-why-envvault) • [CLI Commands](#-cli-commands) • [Security Audit](#-security-audit) • [CI/CD Workflow](#-cicd-integration) • [License](#-license)
+[Quick Start](#-quick-start) • [Why EnvVault](#-why-envvault) • [Comparison](#-feature-comparison-matrix) • [CLI Commands](#-cli-command-reference) • [Security Audit](#-security-audit--linters) • [CI/CD Workflow](#-cicd-integration) • [License](#-license)
 
 </div>
 
@@ -42,17 +42,27 @@ How many times have you done this?
 
 **EnvVault** is a lightweight, offline-first CLI tool built by **Ayoola Damisile** that encrypts project secrets locally using **AES-256-GCM** and injects them directly into running sub-processes without leaving plaintext `.env` files on disk.
 
+### ⚔️ Competitive Edge: How EnvVault Compares
+
+Unlike other tools that force complex setup or dump plain text files on disk:
+
+1. **Zero External Servers / 100% Offline**: Unlike `@iserp/envvault`, there are no remote hubs (`https://YOUR_HUB`), dashboard signups, or monthly cloud costs. It works 100% offline out of the box.
+2. **Zero Web App / PAT Token Friction**: Unlike `@env-vault/cli`, you don't need to visit a web app (`env-locker.vercel.app`), manage Age keys, store TOTP secrets, or create GitHub Personal Access Tokens.
+3. **Memory-Only Subprocess Injection (`envvault run`)**: Tools that pull plaintext `.env` files onto your disk leave passwords vulnerable to malware or accidental `git add .` leaks. EnvVault injects secrets **directly into process memory (`process.env`)**.
+4. **Built-in Security Linter (`envvault audit`)**: Includes an automated scanner to detect plaintext file leaks and un-ignored secrets before pushing to Git.
+
+---
+
 ### Feature Comparison Matrix
 
-| Feature | Plain `.env` | HashiCorp Vault | AWS Secrets Manager | **EnvVault** |
-| :--- | :---: | :---: | :---: | :---: |
-| **Encryption** | ❌ None | ✅ Enterprise | ✅ Cloud | **✅ AES-256-GCM** |
-| **Setup Time** | 1 min | 2+ hours | 30 mins | **30 seconds** |
-| **Offline First** | ✅ Yes | ✅ Yes | ❌ Requires Internet | **✅ 100% Offline** |
-| **Zero Cost / Open Source** | ✅ Free | ✅ Free | ❌ Paid Cloud | **✅ 100% Free** |
-| **Git Leak Protection** | ❌ Risky | ✅ Yes | ✅ Yes | **✅ Auto .gitignore** |
-| **Security Audit Linter** | ❌ None | ❌ Complex | ❌ Complex | **✅ Built-in (`envvault audit`)** |
-| **Process Environment Injection** | ❌ Requires dotenv | ⚠️ Complex | ⚠️ Complex | **✅ Built-in (`envvault run`)** |
+| Feature | Plain `.env` | HashiCorp Vault | `@iserp/envvault` | `@env-vault/cli` | **EnvVault (`@ayoola-tech2024`)** |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **AES-256 Encryption** | ❌ | ✅ | ⚠️ Basic | ✅ Age | **✅ AES-256-GCM** |
+| **Setup Time** | 1 min | 2+ hours | 30 mins | 15 mins | **30 seconds** |
+| **Offline First** | ✅ | ✅ | ❌ Hub Req | ❌ Web Req | **✅ 100% Offline** |
+| **No External Tokens / PATs** | ✅ | ❌ | ❌ | ❌ Required | **✅ Zero Tokens Needed** |
+| **Direct Memory Injection** | ❌ | ⚠️ Complex | ❌ Disk pull | ❌ Disk pull | **✅ `envvault run`** |
+| **Git Leak Auditor** | ❌ | ❌ | ❌ | ❌ | **✅ `envvault audit`** |
 
 ---
 
