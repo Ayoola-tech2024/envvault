@@ -15,7 +15,7 @@
 
 Created by **[Ayoola Damisile](https://github.com/Ayoola-tech2024)**
 
-[![npm version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://www.npmjs.com/package/envvault-cli)
+[![npm version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://www.npmjs.com/package/@damisile_ayoola/envvault)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![Security: AES--256--GCM](https://img.shields.io/badge/security-AES--256--GCM-success.svg)]()
@@ -55,7 +55,7 @@ Unlike other tools that force complex setup or dump plain text files on disk:
 
 ### Feature Comparison Matrix
 
-| Feature | Plain `.env` | HashiCorp Vault | `@iserp/envvault` | `@env-vault/cli` | **EnvVault (`envvault-cli`)** |
+| Feature | Plain `.env` | HashiCorp Vault | `@iserp/envvault` | `@env-vault/cli` | **EnvVault (`@damisile_ayoola/envvault`)** |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **AES-256 Encryption** | ❌ | ✅ | ⚠️ Basic | ✅ Age | **✅ AES-256-GCM** |
 | **Setup Time** | 1 min | 2+ hours | 30 mins | 15 mins | **30 seconds** |
@@ -71,7 +71,7 @@ Unlike other tools that force complex setup or dump plain text files on disk:
 ### 1. Installation
 
 ```bash
-npm install -g envvault-cli
+npm install -g @damisile_ayoola/envvault
 ```
 
 ### 2. Initialize Vault
