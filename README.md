@@ -15,7 +15,7 @@
 
 Created by **[Ayoola Damisile](https://github.com/Ayoola-tech2024)**
 
-[![npm version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://www.npmjs.com/package/envvault)
+[![npm version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://www.npmjs.com/package/@ayoola-tech2024/envvault)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
 [![Security: AES--256--GCM](https://img.shields.io/badge/security-AES--256--GCM-success.svg)]()
@@ -61,7 +61,7 @@ How many times have you done this?
 ### 1. Installation
 
 ```bash
-npm install -g envvault
+npm install -g @ayoola-tech2024/envvault
 ```
 
 ### 2. Initialize Vault
@@ -163,7 +163,7 @@ steps:
     with:
       node-version: '20'
   
-  - run: npm install -g envvault
+  - run: npm install -g @ayoola-tech2024/envvault
   - run: envvault run -- npm run build
     env:
       ENVVAULT_PASSWORD: ${{ secrets.ENVVAULT_MASTER_PASSWORD }}
