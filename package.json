@@ -1,5 +1,5 @@
 {
-  "name": "@ayoola-tech2024/envvault",
+  "name": "envvault-cli",
   "version": "1.1.0",
   "description": "Secure, encrypted environment variable manager with process injection, security auditing, and zero-dependency crypto",
   "main": "src/vault.js",
