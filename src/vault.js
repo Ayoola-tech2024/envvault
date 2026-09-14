@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { encrypt, decrypt, hashPassword, verifyPassword } from './crypto.js';
 
 export const VAULT_FILE = '.envvault';
@@ -13,10 +14,10 @@ function updateGitignore(dir) {
   if (fs.existsSync(gitignorePath)) {
     const content = fs.readFileSync(gitignorePath, 'utf8');
     if (!content.includes(entry)) {
-      fs.appendFileSync(gitignorePath, `\n# EnvVault Encrypted File\n${entry}\n`);
+      fs.appendFileSync(gitignorePath, `\n# EnvVault Encrypted Storage (Never Commit)\n${entry}\n`);
     }
   } else {
-    fs.writeFileSync(gitignorePath, `# EnvVault Encrypted File\n${entry}\n`);
+    fs.writeFileSync(gitignorePath, `# EnvVault Encrypted Storage (Never Commit)\n${entry}\n`);
   }
 }
 
@@ -179,4 +180,49 @@ export function exportSecrets(format = 'env', password, dir = process.cwd()) {
     return `${k}=${needsQuotes ? `"${escaped}"` : v}`;
   });
   return lines.join('\n');
+}
+
+/**
+ * Security Auditor: Audits the current directory for unencrypted plaintext .env leaks & git safety.
+ */
+export function auditSecurity(dir = process.cwd()) {
+  const gitignorePath = path.join(dir, '.gitignore');
+  const hasGitignore = fs.existsSync(gitignorePath);
+  const gitignoreContent = hasGitignore ? fs.readFileSync(gitignorePath, 'utf8') : '';
+  const isVaultGitignored = gitignoreContent.includes('.envvault');
+
+  const potentialUnencryptedEnvs = [
+    '.env',
+    '.env.local',
+    '.env.development',
+    '.env.production',
+    '.env.staging',
+    '.env.test',
+  ];
+
+  const foundUnencrypted = [];
+  for (const envFile of potentialUnencryptedEnvs) {
+    const fullPath = path.join(dir, envFile);
+    if (fs.existsSync(fullPath)) {
+      const isIgnored = gitignoreContent.includes(envFile);
+      foundUnencrypted.push({ filename: envFile, isIgnored });
+    }
+  }
+
+  let isGitTrackedRisk = false;
+  try {
+    const trackedFiles = execSync('git ls-files', { cwd: dir, encoding: 'utf8' });
+    if (trackedFiles.includes('.envvault') || foundUnencrypted.some(f => trackedFiles.includes(f.filename))) {
+      isGitTrackedRisk = true;
+    }
+  } catch (err) {
+    // Ignore if not a git repo
+  }
+
+  return {
+    vaultExists: isVaultInitialized(dir),
+    isVaultGitignored,
+    foundUnencrypted,
+    isGitTrackedRisk,
+  };
 }

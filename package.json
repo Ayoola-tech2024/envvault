@@ -1,7 +1,7 @@
 {
   "name": "envvault",
-  "version": "1.0.0",
-  "description": "Secure, encrypted environment variable manager with process injection and zero-dependency crypto",
+  "version": "1.1.0",
+  "description": "Secure, encrypted environment variable manager with process injection, security auditing, and zero-dependency crypto",
   "main": "src/vault.js",
   "bin": {
     "envvault": "bin/envvault.js"
@@ -10,6 +10,10 @@
   "scripts": {
     "test": "node --test tests/vault.test.js",
     "start": "node bin/envvault.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ayoola-tech2024/envvault.git"
   },
   "keywords": [
     "secrets",
@@ -20,10 +24,15 @@
     "aes-256-gcm",
     "pbkdf2",
     "cli",
-    "vault"
+    "vault",
+    "devsecops"
   ],
-  "author": "Martins Udek",
+  "author": "Ayoola Damisile <ayoola.tech2024@gmail.com> (https://github.com/Ayoola-tech2024)",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ayoola-tech2024/envvault/issues"
+  },
+  "homepage": "https://github.com/Ayoola-tech2024/envvault#readme",
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^11.1.0",

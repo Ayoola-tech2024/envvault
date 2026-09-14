@@ -5,7 +5,6 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import ora from 'ora';
 import fs from 'node:fs';
-import path from 'node:path';
 
 import {
   initVault,
@@ -14,17 +13,29 @@ import {
   listSecrets,
   deleteSecret,
   exportSecrets,
+  auditSecurity,
   isVaultInitialized,
   VAULT_FILE,
 } from '../src/vault.js';
 import { runWithSecrets } from '../src/runner.js';
 
+const BANNER = `
+${chalk.cyan('  ███████╗███╗   ██╗██╗   ██╗██╗   ██╗██████╗  ██████╗ ██╗     ████████╗')}
+${chalk.cyan('  ██╔════╝████╗  ██║██║   ██║██║   ██║██╔══██╗██╔═══██╗██║     ╚══██╔══╝')}
+${chalk.blue('  █████╗  ██╔██╗ ██║██║   ██║██║   ██║██████╔╝██║   ██║██║        ██║   ')}
+${chalk.blue('  ██╔══╝  ██║╚██╗██║╚██╗ ██╔╝██║   ██║██╔══██╗██║   ██║██║        ██║   ')}
+${chalk.magenta('  ███████╗██║ ╚████║ ╚████╔╝ ╚██████╔╝██████╔╝╚██████╔╝███████╗   ██║   ')}
+${chalk.magenta('  ╚══════╝╚═╝  ╚═══╝  ╚═══╝   ╚═════╝ ╚═════╝  ╚═════╝ ╚══════╝   ╚═╝   ')}
+${chalk.gray('      🔐 AES-256-GCM Encrypted Secret Manager by Ayoola Damisile')}
+`;
+
 const program = new Command();
 
 program
   .name('envvault')
-  .description('🔐 Secure, encrypted environment variable manager with AES-256-GCM')
-  .version('1.0.0');
+  .description('🔐 Secure, encrypted environment variable manager with AES-256-GCM & zero external crypto')
+  .version('1.1.0')
+  .addHelpText('before', BANNER);
 
 /**
  * Prompt for master password if ENVVAULT_PASSWORD is not set.
@@ -53,12 +64,12 @@ program
   .description('Initialize a new encrypted .envvault in the current directory')
   .action(async () => {
     try {
+      console.log(BANNER);
+
       if (isVaultInitialized()) {
         console.log(chalk.yellow(`\n⚠️  Vault already exists at '${VAULT_FILE}'.`));
         return;
       }
-
-      console.log(chalk.bold.cyan('\n🔐 Initializing EnvVault Secure Storage...\n'));
 
       let password = process.env.ENVVAULT_PASSWORD;
       if (!password) {
@@ -131,12 +142,18 @@ program
 program
   .command('get')
   .argument('<key>', 'Environment variable key name')
+  .option('-r, --raw', 'Output raw decrypted secret value without formatting (great for shell piping)', false)
   .description('Retrieve and decrypt a specific secret value')
-  .action(async (key) => {
+  .action(async (key, options) => {
     try {
       const password = await getMasterPassword();
       const value = getSecret(key, password);
-      console.log(`\n${chalk.bold.cyan(key)} = ${chalk.green(value)}\n`);
+
+      if (options.raw) {
+        process.stdout.write(value);
+      } else {
+        console.log(`\n${chalk.bold.cyan(key)} = ${chalk.green(value)}\n`);
+      }
     } catch (err) {
       console.error(chalk.red(`\n❌ Error: ${err.message}`));
       process.exit(1);
@@ -233,6 +250,42 @@ program
     } catch (err) {
       console.error(chalk.red(`\n❌ Export Error: ${err.message}`));
       process.exit(1);
+    }
+  });
+
+/**
+ * Command: audit
+ */
+program
+  .command('audit')
+  .description('Audit project directory for unencrypted .env leaks & git security risks')
+  .action(() => {
+    console.log(BANNER);
+    console.log(chalk.bold.cyan('\n🛡️  Running EnvVault Security Audit...\n'));
+
+    const audit = auditSecurity();
+
+    if (audit.vaultExists) {
+      console.log(chalk.green('  ✅ Encrypted .envvault storage detected.'));
+    } else {
+      console.log(chalk.yellow('  ⚠️  No .envvault initialized yet. Run `envvault init` to create one.'));
+    }
+
+    if (audit.isVaultGitignored) {
+      console.log(chalk.green('  ✅ .envvault is properly listed in .gitignore.'));
+    } else if (audit.vaultExists) {
+      console.log(chalk.red('  ❌ CRITICAL: .envvault is NOT in .gitignore! Add it immediately to avoid committing key files.'));
+    }
+
+    if (audit.foundUnencrypted.length > 0) {
+      console.log(chalk.yellow(`\n  ⚠️  Found ${audit.foundUnencrypted.length} unencrypted plaintext .env file(s) on disk:`));
+      audit.foundUnencrypted.forEach(f => {
+        const status = f.isIgnored ? chalk.gray('(GitIgnored)') : chalk.red('⚠️ EXPOSED IN GIT!');
+        console.log(`     - ${chalk.bold(f.filename)} ${status}`);
+      });
+      console.log(chalk.cyan('\n  💡 Recommendation: Move these secrets into EnvVault with `envvault set KEY VALUE` and delete plain .env files!\n'));
+    } else {
+      console.log(chalk.green('  ✅ No plain text .env files exposed on disk.\n'));
     }
   });
 

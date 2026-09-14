@@ -13,6 +13,7 @@ import {
   deleteSecret,
   exportSecrets,
   getDecryptedEnv,
+  auditSecurity,
   VAULT_FILE,
 } from '../src/vault.js';
 
@@ -91,6 +92,22 @@ test('Vault Storage Lifecycle Integration', () => {
     deleteSecret('PORT', masterPassword, tempDir);
     const updatedSecrets = listSecrets(masterPassword, tempDir);
     assert.equal(updatedSecrets.length, 1);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('Security Audit Feature', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'envvault-audit-test-'));
+  try {
+    initVault('password123', tempDir);
+    fs.writeFileSync(path.join(tempDir, '.env'), 'SECRET=123');
+
+    const audit = auditSecurity(tempDir);
+    assert.equal(audit.vaultExists, true);
+    assert.equal(audit.isVaultGitignored, true);
+    assert.equal(audit.foundUnencrypted.length, 1);
+    assert.equal(audit.foundUnencrypted[0].filename, '.env');
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }
