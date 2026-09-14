@@ -1,0 +1,33 @@
+{
+  "name": "envvault",
+  "version": "1.0.0",
+  "description": "Secure, encrypted environment variable manager with process injection and zero-dependency crypto",
+  "main": "src/vault.js",
+  "bin": {
+    "envvault": "bin/envvault.js"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/vault.test.js",
+    "start": "node bin/envvault.js"
+  },
+  "keywords": [
+    "secrets",
+    "environment-variables",
+    "dotenv",
+    "security",
+    "encryption",
+    "aes-256-gcm",
+    "pbkdf2",
+    "cli",
+    "vault"
+  ],
+  "author": "Martins Udek",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "inquirer": "^9.2.12",
+    "ora": "^7.0.1"
+  }
+}

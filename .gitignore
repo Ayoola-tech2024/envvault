@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Vault File (Security Guard)
+.envvault
+
+# Logs & Debug
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
